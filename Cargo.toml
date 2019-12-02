@@ -1,0 +1,16 @@
+[package]
+name = "advent_of_code_2019"
+version = "0.1.0"
+authors = ["AGoetz Dev"]
+edition = "2018"
+
+
+[lib]
+bench = false
+
+[dependencies]
+aoc-runner = "0.2.2"
+aoc-runner-derive = "0.2.2"
+chrono = "0.4"
+regex = "1"
+lazy_static = "1.2.0"
