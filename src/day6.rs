@@ -26,7 +26,7 @@ pub fn input_generator(input: &str) -> Vec<Orbit> {
 
 
 #[aoc(day6, part1)]
-pub fn solve_part1(mut input: &Vec<Orbit>) -> i64 {
+pub fn solve_part1(input: &Vec<Orbit>) -> i64 {
     
     let mut memory: HashMap<String, Orbit> = HashMap::new();
     for orbit in input {
@@ -156,7 +156,7 @@ impl<T> Grid<T> {
 }
 
 #[aoc(day6, part2)]
-pub fn solve_part2(mut input: &Vec<Orbit>) -> usize {
+pub fn solve_part2(input: &Vec<Orbit>) -> usize {
     let mut grid = Grid::new();
     let mut memory: HashMap<String, usize> = HashMap::new();
     let mut edges: Vec<(usize, usize, usize)> = Vec::new();
