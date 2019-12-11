@@ -60,6 +60,7 @@ pub fn solve_part2(input: &HashSet<Point>) -> isize {
         if o == Point(0, 0) {
             continue;
         }
+
         let x = point.0 - part1_p.0;
         let y = point.1 - part1_p.1;
         
@@ -89,14 +90,13 @@ pub fn solve_part2(input: &HashSet<Point>) -> isize {
     });
     let mut c = 0;
     let mut list_ix = 0;
-    let mut this = Point(0, 0);
+    let mut target = Point(0, 0);
     let mut non_empty_lists = as_list.len();
     while c < 200 && non_empty_lists > 0 {
         let heap = &mut as_list[list_ix].1;
         match heap.pop() {
             Some(Reverse((_, x))) => {
-                this = x;
-                //println!("Zapped {} {:?}", c + 1, this);
+                target = x;
                 c += 1;
             }
             None => {
@@ -105,7 +105,7 @@ pub fn solve_part2(input: &HashSet<Point>) -> isize {
         }
         list_ix = (list_ix + 1) % as_list.len();
     }
-    this.0 * 100 + this.1
+    target.0 * 100 + target.1
 }
 
 
@@ -115,8 +115,8 @@ pub struct Point(pub isize, pub isize);
 
 impl Sub for Point {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self {
-        Point(self.0 - rhs.0, self.1 - rhs.1)
+    fn sub(self, r: Self) -> Self {
+        Point(self.0 - r.0, self.1 - r.1)
     }
 }
 
