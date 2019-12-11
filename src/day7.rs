@@ -119,13 +119,13 @@ fn run_simulation(program: Vec<i64>, phase_modes: Vec<i64>, force_start: bool) -
                 let result = execute_program(prog, phase_mode, &sender, &receiver);
                 match result {
                     Ok(r) => {
-                        //println!("Result: {:?} {:?}", i, r);
-                        sim_tx.send(SimulationMessage::Input(r));
+                        
+                        sim_tx.send(SimulationMessage::Input(r)).unwrap_or_else(|_e| println!("Failed to send Input in {:?}", i));
                     },
                     Err(_s) => {
-                        //println!("Halted: {:?}", i);
-                        sender.send(SimulationMessage::HaltEvent("Halt".to_string()));
-                        sim_tx.send(SimulationMessage::HaltEvent("Halt".to_string()));
+                        
+                        sender.send(SimulationMessage::HaltEvent("Halt".to_string())).unwrap_or_else(|_e| println!("Failed to send Halt1 in {:?}", i));
+                        sim_tx.send(SimulationMessage::HaltEvent("Halt".to_string())).unwrap_or_else(|_e| println!("Failed to send Halt2 in {:?}", i));
                     }
                     
                 }
@@ -139,19 +139,19 @@ fn run_simulation(program: Vec<i64>, phase_modes: Vec<i64>, force_start: bool) -
             let receiver = thread_receivers.remove(receiver_id);
             removed_receivers +=1;
 
-            //println!("Amp {:?} started with sender {:?} and receiver {:?}", i, sender.0, receiver.0);
+           
             thread::spawn(move || {
                 let sender = sender.1;
                 let receiver = receiver.1;
                 let prog = prog_clone;
                 let result = execute_program(prog, phase_mode, &sender, &receiver);
                 match result {
-                    Ok(r) => {
-                        //println!("Result: {:?} {:?}", i, r);
+                    Ok(_r) => {
+                        
                     },
                     Err(_s) => {
-                        //println!("Halted: {:?}", i);
-                        sender.send(SimulationMessage::HaltEvent("Halt".to_string()));
+                       
+                        sender.send(SimulationMessage::HaltEvent("Halt".to_string())).unwrap_or_else(|_e| println!("Failed to send Halt in {:?}", i));
                     }
                     
                 }
@@ -160,7 +160,7 @@ fn run_simulation(program: Vec<i64>, phase_modes: Vec<i64>, force_start: bool) -
     }
     
     if force_start {
-        first_sender.send(SimulationMessage::Input(0));
+        first_sender.send(SimulationMessage::Input(0)).unwrap_or_else(|_e| println!("Failed to send First Sender Input"));
     }
     
     match sim_receiver {
@@ -259,7 +259,7 @@ fn execute_program(memory: Vec<i64>, phase_mode: i64, sender: &Sender<Simulation
                                             SimulationMessage::Input(t) => {
                                                 input[target as usize] = t;
                                             },
-                                            SimulationMessage::HaltEvent(s) => {
+                                            SimulationMessage::HaltEvent(_s) => {
                                                 return Err("Halted By Previous");
                                             }
                                         }
@@ -283,7 +283,7 @@ fn execute_program(memory: Vec<i64>, phase_mode: i64, sender: &Sender<Simulation
                         let param1 = get_param(&input,param_modes[0], 1, index);
                         
                         last_output = param1;
-                        sender.send(SimulationMessage::Input(last_output));
+                        sender.send(SimulationMessage::Input(last_output)).unwrap_or_else(|_e| println!("Failed to send output"));
                         advance = 2;
 
                     }

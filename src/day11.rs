@@ -130,11 +130,11 @@ fn run_simulation(program: Vec<i64>, initial_inputs: &Vec<Vec<i64>>, print: bool
                     let result = computer.execute_program();
                     match result {
                         Ok(r) => {
-                            sim_tx.send(SimulationMessage::HaltEvent(Ok(r)));
+                            sim_tx.send(SimulationMessage::HaltEvent(Ok(r))).unwrap_or_else(|_e| println!("Failed to send Successful Halt in {:?}", i));
                         },
                         Err(s) => {
-                            computer.sender.send(SimulationMessage::HaltEvent(Err(s)));
-                            sim_tx.send(SimulationMessage::HaltEvent(Err(s)));
+                            computer.sender.send(SimulationMessage::HaltEvent(Err(s))).unwrap_or_else(|_e| println!("Failed to send Err Halt1 in {:?}", i));
+                            sim_tx.send(SimulationMessage::HaltEvent(Err(s))).unwrap_or_else(|_e| println!("Failed to send Err Halt2 in {:?}", i));
                         }
                         
                     }
@@ -160,7 +160,7 @@ fn run_simulation(program: Vec<i64>, initial_inputs: &Vec<Vec<i64>>, print: bool
                             
                         },
                         Err(s) => {
-                            computer.sender.send(SimulationMessage::HaltEvent(Err(s)));
+                            computer.sender.send(SimulationMessage::HaltEvent(Err(s))).unwrap_or_else(|_e| println!("Failed to send Err Halt in {:?}", i));
                         }
                         
                     }
@@ -185,10 +185,10 @@ fn run_simulation(program: Vec<i64>, initial_inputs: &Vec<Vec<i64>>, print: bool
             let result = computer.execute_program();
             match result {
                 Ok(r) => {
-                    computer.sender.send(SimulationMessage::HaltEvent(Ok(r)));
+                    computer.sender.send(SimulationMessage::HaltEvent(Ok(r))).unwrap_or_else(|_e| println!("Failed to send Successful Halt in {:?}", 0));
                 },
                 Err(s) => {
-                    computer.sender.send(SimulationMessage::HaltEvent(Err(s))); 
+                    computer.sender.send(SimulationMessage::HaltEvent(Err(s))).unwrap_or_else(|_e| println!("Failed to send Err Halt in {:?}", 0)); 
                 }
                         
             }
@@ -266,7 +266,7 @@ fn run_simulation(program: Vec<i64>, initial_inputs: &Vec<Vec<i64>>, print: bool
                                         }
                                         mode = RobotOutputMode::Paint;
                                         let entry = hull.entry(current_position).or_insert((0, 0));
-                                        first_sender.send(SimulationMessage::Input(entry.0));
+                                        first_sender.send(SimulationMessage::Input(entry.0)).unwrap_or_else(|_e| println!("Failed to send input to first sender"));
                                     }
                                 }
                                 //println!("Received: {:?}", t);
@@ -431,7 +431,7 @@ impl IntCodeComputer {
                                         SimulationMessage::Input(input) => {
                                             self.set_param(param_modes[0], input, self.ip+1, self.base);
                                         },
-                                        SimulationMessage::HaltEvent(s) => {
+                                        SimulationMessage::HaltEvent(_s) => {
                                             return Err("Halted By Previous");
                                         },
                                     }
@@ -454,7 +454,7 @@ impl IntCodeComputer {
                 4 => {
                     let param1 = self.get_param(param_modes[0], 1, self.ip, self.base);
                     last_output = param1;
-                    self.sender.send(SimulationMessage::Input(last_output));
+                    self.sender.send(SimulationMessage::Input(last_output)).unwrap_or_else(|_e| println!("Failed to send output in {:?}", self.id));
                     advance = 2;
 
                 }
